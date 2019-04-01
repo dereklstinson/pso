@@ -50,12 +50,21 @@ func CreateSwarm32(seed int) *Swarm32 {
 }
 
 //SetVanilla sets the pso to vanilla mode
-func (s *Swarm32) SetVanilla(numofparticles, dims int, cognative, social, vmax, minpositionstart, maxpositionstart float32) {
+func (s *Swarm32) SetVanilla(
+	numofparticles int,
+	dims int,
+	cognative float32,
+	social float32,
+	vmax float32,
+	minpositionstart float32,
+	maxpositionstart float32) {
+
 	s.setswarm(s.mode.vanilla(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, 0, 0)
 }
 
 //SetConstantInertia sets the particles update local positions based on Constant Inertia algorithm
-func (s *Swarm32) SetConstantInertia(numofparticles int,
+func (s *Swarm32) SetConstantInertia(
+	numofparticles int,
 	dims int,
 	cognative float32,
 	social float32,
