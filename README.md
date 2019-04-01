@@ -5,6 +5,8 @@ Based on slides from https://www.mii.lt/zilinskas/uploads/Heuristic%20Algorithms
 
 Added some vales like minstart and maxstart.  Lets say you are wanting to optimize the meta values of a neural network.  You know that you don't want the learning rate anywhere near 1 or even greater than one.  You can set it it minxstart to .001 and maxxstart to .01. So it doesn't go crazy trying to find the optimum values.  
 
+Most of these functions are not thread safe.  I tried to make the AsyncUpdate and the IndvSyncUpdate methods thread safe, but they are not tested.  
+
 If you know a better way to allow the users to parallelize this then please let me know.
 
 TODO:

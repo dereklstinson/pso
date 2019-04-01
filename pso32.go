@@ -193,12 +193,15 @@ func (s *Swarm32) ResetParticles(indexes []int, resetglobalposition bool) error 
 
 //AsyncUpdate does the update asyncrounusly
 func (s *Swarm32) AsyncUpdate(index int, fitness float32) error {
+	s.mux.Lock()
 	if index >= len(s.particles) {
 		return errors.New("Index Out Of Bounds")
 	}
+
 	switch s.max {
 	case true:
 		if fitness > s.fitness {
+
 			s.fitness = fitness
 			copy(s.globalposition, s.particles[index].position)
 		}
@@ -208,9 +211,13 @@ func (s *Swarm32) AsyncUpdate(index int, fitness float32) error {
 			copy(s.globalposition, s.particles[index].position)
 		}
 	}
+	s.k++
+	s.mux.Unlock()
+	s.mux.RLock()
 	s.particles[index].isbest(fitness, s.max)
 	s.particles[index].update(s.mode, s.cognative, s.social, s.vmax, s.constriction, s.globalposition)
-	s.k++
+
+	s.mux.RUnlock()
 	return nil
 }
 
