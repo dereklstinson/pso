@@ -66,7 +66,7 @@ func (s *Swarm32) GenericSet(mode Mode,
 	maxpositionstart float32,
 	alphamax float32,
 	inertiamax float32) {
-	s.setswarm(s.mode.vanilla(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, alphamax, inertiamax)
+	s.setswarm(mode, numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, alphamax, inertiamax)
 }
 
 //ChangeUpdateValues will change the values are used when the swarm does it's updates.
@@ -144,7 +144,7 @@ func (s *Swarm32) SetVanilla(
 	minpositionstart float32,
 	maxpositionstart float32) {
 
-	s.setswarm(s.mode.vanilla(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, .5, .5)
+	s.setswarm(s.mode.Vanilla(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, .5, .5)
 }
 
 //SetConstantInertia sets the particles update local positions based on Constant Inertia algorithm
@@ -157,7 +157,7 @@ func (s *Swarm32) SetConstantInertia(
 	minpositionstart float32,
 	maxpositionstart float32,
 	inertiamax float32) {
-	s.setswarm(s.mode.constantinertia(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, .5, inertiamax)
+	s.setswarm(s.mode.ConstantInertia(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, .5, inertiamax)
 }
 
 //SetConstriction sets the particles update local positions based on Constriction algorithm
@@ -170,14 +170,14 @@ func (s *Swarm32) SetConstriction(
 	minpositionstart float32,
 	maxpositionstart float32,
 ) {
-	s.setswarm(s.mode.constriction(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, .5, .5)
+	s.setswarm(s.mode.Constriction(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, .5, .5)
 }
 
 //SetDynamicInertiaMaxVelocityReduction sets the particals to Dynamic Inertria Max Velocity Reduction
 func (s *Swarm32) SetDynamicInertiaMaxVelocityReduction(
 	numofparticles, dims int,
 	cognative, social, vmaxgamma, minpositionstart, maxpositionstart, inertiamax float32) {
-	s.setswarm(s.mode.dynamicInertiaMaxVelReduction(), numofparticles, dims, cognative, social, vmaxgamma, minpositionstart, maxpositionstart, 1, inertiamax)
+	s.setswarm(s.mode.DynamicInertiaMaxVelReduction(), numofparticles, dims, cognative, social, vmaxgamma, minpositionstart, maxpositionstart, 1, inertiamax)
 }
 
 //SetLinearInertiaReduce sets the particles to LinearInertiaReduce
@@ -191,7 +191,7 @@ func (s *Swarm32) SetLinearInertiaReduce(
 	maxpositionstart float32,
 	alphamax float32,
 	inertiamax float32) {
-	s.setswarm(s.mode.inertiareduction(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, alphamax, inertiamax)
+	s.setswarm(s.mode.InertiaReduction(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, alphamax, inertiamax)
 
 }
 

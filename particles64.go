@@ -78,15 +78,15 @@ func (p *particle64) reset(maxv, minxstart, maxxstart, maxalpha, maxinertia floa
 //Update will update velocities,and position
 func (p *particle64) update(mode Mode, cognative, social, vmax, constriction float64, globalbest []float64) {
 	switch mode {
-	case p.mflg.vanilla():
+	case p.mflg.Vanilla():
 		p.vanilla(cognative, social, vmax, globalbest)
-	case p.mflg.constantinertia():
+	case p.mflg.ConstantInertia():
 		p.constant(cognative, social, vmax, globalbest)
-	case p.mflg.inertiareduction():
+	case p.mflg.InertiaReduction():
 		p.linearinertiareduce(cognative, social, vmax, globalbest)
-	case p.mflg.constriction():
+	case p.mflg.Constriction():
 		p.constriction(cognative, social, vmax, constriction, globalbest)
-	case p.mflg.dynamicInertiaMaxVelReduction():
+	case p.mflg.DynamicInertiaMaxVelReduction():
 		p.dimvr(cognative, social, vmax, globalbest)
 		//case p.mflg.SocialPressure():
 	}
