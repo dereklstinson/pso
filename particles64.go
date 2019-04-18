@@ -4,7 +4,7 @@ import "math/rand"
 
 type particle64 struct {
 	rng      *rand.Rand
-	mflg     mode
+	mflg     Mode
 	source   rand.Source
 	fitness  float64
 	position []float64
@@ -76,7 +76,7 @@ func (p *particle64) reset(maxv, minxstart, maxxstart, maxalpha, maxinertia floa
 }
 
 //Update will update velocities,and position
-func (p *particle64) update(mode mode, cognative, social, vmax, constriction float64, globalbest []float64) {
+func (p *particle64) update(mode Mode, cognative, social, vmax, constriction float64, globalbest []float64) {
 	switch mode {
 	case p.mflg.vanilla():
 		p.vanilla(cognative, social, vmax, globalbest)

@@ -4,7 +4,7 @@ import "math/rand"
 
 type particle struct {
 	rng      *rand.Rand
-	mode     mode
+	mode     Mode
 	source   rand.Source
 	fitness  float32
 	position []float32
@@ -76,7 +76,7 @@ func (p *particle) reset(maxv, minxstart, maxxstart, maxalpha, maxinertia float3
 }
 
 //Update will update velocities,and position
-func (p *particle) update(mode mode, cognative, social, vmax, constriction float32, globalbest []float32) {
+func (p *particle) update(mode Mode, cognative, social, vmax, constriction float32, globalbest []float32) {
 	switch mode {
 	case p.mode.vanilla():
 		p.vanilla(cognative, social, vmax, globalbest)

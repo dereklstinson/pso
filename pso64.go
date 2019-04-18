@@ -24,7 +24,7 @@ type Swarm64 struct {
 	cognative, social, vmax, constriction, alphamax, xminstart, xmaxstart, inertiamax float64
 	particles                                                                         []particle64
 	globalposition                                                                    []float64
-	mode                                                                              mode
+	mode                                                                              Mode
 	source                                                                            rand.Source
 	rng                                                                               *rand.Rand
 	mux                                                                               *sync.RWMutex
@@ -52,6 +52,85 @@ func CreateSwarm64(seed int) *Swarm64 {
 		k:      1,
 		mux:    new(sync.RWMutex),
 	}
+}
+
+//GenericSet allows you to set mode more generically.
+func (s *Swarm64) GenericSet(mode Mode,
+	numofparticles int,
+	dims int,
+	cognative float64,
+	social float64,
+	vmax float64,
+	minpositionstart float64,
+	maxpositionstart float64,
+	alphamax float64,
+	inertiamax float64) {
+	s.setswarm(s.mode.vanilla(), numofparticles, dims, cognative, social, vmax, minpositionstart, maxpositionstart, alphamax, inertiamax)
+}
+
+//ChangeUpdateValues will change the values are used when the swarm does it's updates.
+//
+//Ignored Values/Combinations:
+//	1)Negative numbers will be ignored.
+//	2)Social and cognative can't both be zero. That will be ignored.
+//	3)Vmax <= 0 will be ignored.
+//
+//Some values will be ignored depending on the mode.
+func (s *Swarm64) ChangeUpdateValues(cognative, social, vmax float64) {
+
+	if cognative < 0 && social >= 0 {
+		s.social = social
+	} else if cognative >= 0 && social < 0 {
+		s.cognative = cognative
+	} else if cognative > 0 && social > 0 {
+		s.cognative = cognative
+		s.social = social
+	}
+	if vmax > 0 {
+		s.vmax = vmax
+	}
+	gamma := float64(s.social + s.cognative)
+	s.constriction = float64(2 / (2 - gamma - math.Sqrt((gamma*gamma)-4*gamma)))
+
+}
+
+//ChangeMinStart will change the minstart for new or resetted particles.
+//
+//It is up to the user to make sure that maxstart>s.minstart before a reset particle is called
+func (s *Swarm64) ChangeMinStart(minstart float64) {
+	s.xminstart = minstart
+}
+
+//ChangeMaxStart will change the max start for new or resetted particles.
+//
+//It is up to the user to make sure that maxstart>s.minstart before a reset particle is called
+func (s *Swarm64) ChangeMaxStart(maxstart float64) {
+	s.xmaxstart = maxstart
+}
+
+//ChangeAlphaMax changes alpha max for new or resetted particles.
+//
+//alphamax<=0 will be ignored
+func (s *Swarm64) ChangeAlphaMax(alphamax float64) {
+	if alphamax > 0 {
+		s.alphamax = alphamax
+	}
+
+}
+
+//ChangeInertiaMax changes the inertia max value for new or resetted particles
+//
+//inertiamax<=0 will be ignored
+func (s *Swarm64) ChangeInertiaMax(inertiamax float64) {
+	if inertiamax > 0 {
+		s.inertiamax = inertiamax
+	}
+}
+
+//ChangeMode changes the mode. Certain modes have different init values. I made the default .5. It might be too high.
+//You might want to run ChangeInitValues, first. Then run change mode, second. Then lastly run ResetParticles with a good chunk being reset.
+func (s *Swarm64) ChangeMode(mode Mode) {
+	s.mode = mode
 }
 
 //SetVanilla sets the pso to vanilla mode
@@ -144,7 +223,7 @@ func (s *Swarm64) SetFitness(max bool) {
 }
 
 //CreateSwarm64 creates a particle swarm
-func (s *Swarm64) setswarm(mode mode,
+func (s *Swarm64) setswarm(mode Mode,
 	numofparticles int,
 	dims int,
 	cognative float64,
