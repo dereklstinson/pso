@@ -31,6 +31,12 @@ type Swarm32 struct {
 	mux                                                                               *sync.RWMutex
 }
 
+//FitnessIndex32 is used when getting the fitnes of a particle
+type FitnessIndex32 struct {
+	Particle int
+	Fitness  float32
+}
+
 //CreateSwarm32 creates a particle swarm. If seed is negative it will initialize the rng source with computer clock.
 //If it is positive it will initialize the swarm using the seed passed.
 //
@@ -173,7 +179,7 @@ func (s *Swarm32) setswarm(
 }
 
 //ResetParticles resets the particles based on the index array passed
-func (s *Swarm32) ResetParticles(indexes []int, resetglobalposition bool) error {
+func (s *Swarm32) ResetParticles(indexes []FitnessIndex32, resetglobalposition bool) error {
 	numofparticles := len(s.particles)
 	if len(indexes) > numofparticles {
 		return errors.New("Length of indexes larger than particle number")
@@ -185,7 +191,7 @@ func (s *Swarm32) ResetParticles(indexes []int, resetglobalposition bool) error 
 	}
 
 	for i := range indexes {
-		s.particles[indexes[i]].reset(s.vmax, s.xminstart, s.xmaxstart, s.alphamax, s.inertiamax)
+		s.particles[indexes[i].Particle].reset(s.vmax, s.xminstart, s.xmaxstart, s.alphamax, s.inertiamax)
 	}
 
 	return nil
@@ -239,23 +245,28 @@ func (s *Swarm32) ParticlePosition(index int) []float32 {
 }
 
 //ParticleFitness returns the fitness of particle at indexed location
-func (s *Swarm32) ParticleFitness(index int) float32 {
-	return s.particles[index].fitness
+func (s *Swarm32) ParticleFitness(index int) FitnessIndex32 {
+	return FitnessIndex32{
+		Fitness:  s.particles[index].fitness,
+		Particle: index,
+	}
 }
 
 //KillParticles kills the partilces in the indexes slice.
-func (s *Swarm32) KillParticles(indexes []int) error {
+func (s *Swarm32) KillParticles(indexes []FitnessIndex32) error {
 	numofparticles := len(s.particles)
 	if len(indexes) > numofparticles {
 		return errors.New("Length of indexes larger than particle number")
 	}
 	index := 0
 	npindex := 0
-	sort.Ints(indexes)
+	sort.Slice(indexes, func(i, j int) bool {
+		return indexes[i].Particle < indexes[j].Particle
+	})
 	reshapedparticles := make([]particle, len(s.particles)-len(indexes))
 	for i := range s.particles {
 		for j := index; j < len(indexes); j++ {
-			if indexes[j] != i {
+			if indexes[j].Particle != i {
 				reshapedparticles[npindex] = s.particles[i]
 				npindex++
 				index++
@@ -292,13 +303,17 @@ func (s *Swarm32) AddParticles(num int) {
 //
 //	if previousfitnesses==nil || len(previousfitnesses)!=len(hidden particles) then
 //	method will allocate new memory and return the fitnesses of the current particles.
-func (s *Swarm32) AllFitnesses(previousfitnesses []float32) []float32 {
+func (s *Swarm32) AllFitnesses(previousfitnesses []FitnessIndex32) []FitnessIndex32 {
 	if previousfitnesses == nil || len(previousfitnesses) != len(s.particles) {
-		previousfitnesses = make([]float32, len(s.particles))
+		previousfitnesses = make([]FitnessIndex32, len(s.particles))
 	}
 	for i := range previousfitnesses {
-		previousfitnesses[i] = s.particles[i].fitness
+		previousfitnesses[i].Particle = i
+		previousfitnesses[i].Fitness = s.particles[i].fitness
 	}
+	sort.Slice(previousfitnesses, func(i, j int) bool {
+		return previousfitnesses[i].Fitness < previousfitnesses[j].Fitness
+	})
 	return previousfitnesses
 }
 
@@ -327,7 +342,7 @@ func (s *Swarm32) SyncUpdate(fitnesses []float32) error {
 	return nil
 }
 
-//IndvSyncUpdatePart1 of 3out of three allows user to parallelize the syncronous update doing it in parts.
+//IndvSyncUpdatePart1 of 3 allows user to parallelize the syncronous update doing it in parts.
 //
 //This finds the local best for each particle.
 //There might some memory copying in this. Unless the dims are absolutly huge, or you put several of these into
