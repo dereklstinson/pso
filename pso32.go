@@ -301,7 +301,6 @@ func (s *Swarm32) AsyncUpdate(index int, fitness float32) error {
 	s.mux.RLock()
 	s.particles[index].isbest(fitness, s.max)
 	s.particles[index].update(s.mode, s.cognative, s.social, s.vmax, s.constriction, s.globalposition)
-
 	s.mux.RUnlock()
 	return nil
 }
@@ -318,7 +317,9 @@ func (s *Swarm32) GlobalPosition() []float32 {
 
 //ParticlePosition returns the particle position of the index passed
 func (s *Swarm32) ParticlePosition(index int) []float32 {
-
+	if index>len(s.particles)-1{
+		return nil
+	}
 	return s.particles[index].position
 
 }
