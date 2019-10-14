@@ -91,6 +91,12 @@ func (s *Swarm64) ChangeUpdateValues(cognative, social, vmax float64) {
 	}
 	gamma := float64(s.social + s.cognative)
 	s.constriction = float64(2 / (2 - gamma - math.Sqrt((gamma*gamma)-4*gamma)))
+	var m Mode
+	if s.mode == m.Constriction(){
+		if s.constriction <=4{
+			panic("Constriction limitation: Cognative + Social <= 4")
+		}
+	}
 
 }
 
@@ -244,7 +250,12 @@ func (s *Swarm64) setswarm(mode Mode,
 	s.alphamax = alphamax
 	gamma := float64(social + cognative)
 	s.constriction = float64(2 / (2 - gamma - math.Sqrt((gamma*gamma)-4*gamma)))
-
+	var m Mode
+	if s.mode == m.Constriction(){
+		if s.constriction <=4{
+			panic("Constriction limitation: Cognative + Social <= 4")
+		}
+	}
 	if s.max {
 		s.fitness = -99999999
 	} else {
