@@ -94,7 +94,7 @@ func (s *Swarm32) ChangeUpdateValues(cognative, social, vmax float32) {
 	s.constriction = float32(2 / (2 - gamma - math.Sqrt((gamma*gamma)-4*gamma)))
 	var m Mode
 	if s.mode == m.Constriction(){
-		if s.constriction <=4{
+		if gamma <=4{
 			panic("Constriction limitation: Cognative + Social <= 4")
 		}
 	}
@@ -140,8 +140,8 @@ func (s *Swarm32) ChangeMode(mode Mode) {
 	s.mode = mode
 	var m Mode
 	if s.mode == m.Constriction(){
-		if s.constriction <=4{
-			panic("Constriction limitation: Cognative + Social <= 4")
+		if math.IsNaN(float64(s.constriction)){
+			panic("Constriction is nan: Cognative + Social mus be > 4")
 		}
 	}
 }
@@ -258,7 +258,7 @@ func (s *Swarm32) setswarm(
 	s.constriction = float32(2 / (2 - gamma - math.Sqrt((gamma*gamma)-4*gamma)))
 	var m Mode
 	if s.mode == m.Constriction(){
-		if s.constriction <=4{
+		if gamma <=4{
 			panic("Constriction limitation: Cognative + Social <= 4")
 		}
 	}
