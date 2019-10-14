@@ -413,7 +413,38 @@ func (s *Swarm32) AllFitnesses(previousfitnesses []FitnessIndex32) []FitnessInde
 	})
 	return previousfitnesses
 }
+//SyncUpdateMultiThread is a MultiThreaded sync update
+func (s *Swarm32)SyncUpdateMultiThread(fitnesses []float32)error{
+	if len(fitnesses) != len(s.particles) {
+		return errors.New("Sizes of losses and num of particles not the same")
+	}
+	position := -1
+	for i := range fitnesses {
+		s.particles[i].isbest(fitnesses[i], s.max)
+		if fitnesses[i] < s.fitness {
+			s.fitness = fitnesses[i]
+			position = i
 
+		}
+
+	}
+	if position > -1 {
+		copy(s.globalposition, s.particles[position].position)
+	}
+	
+	var wg sync.WaitGroup
+	for i := range s.particles {
+	wg.Add(1)
+go func(i int){
+	s.particles[i].update(s.mode, s.cognative, s.social, s.vmax, s.constriction, s.globalposition)
+wg.Done()
+	}(i)
+	
+	}
+	wg.Wait()
+	s.k++
+	return nil
+}
 //SyncUpdate updates the particle swarm after all particles tested
 func (s *Swarm32) SyncUpdate(fitnesses []float32) error {
 	if len(fitnesses) != len(s.particles) {
