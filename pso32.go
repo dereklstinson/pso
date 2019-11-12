@@ -93,8 +93,8 @@ func (s *Swarm32) ChangeUpdateValues(cognative, social, vmax float32) {
 	gamma := float64(s.social + s.cognative)
 	s.constriction = float32(2 / (2 - gamma - math.Sqrt((gamma*gamma)-4*gamma)))
 	var m Mode
-	if s.mode == m.Constriction(){
-		if gamma <=4{
+	if s.mode == m.Constriction() {
+		if gamma <= 4 {
 			panic("Constriction limitation: Cognative + Social <= 4")
 		}
 	}
@@ -139,8 +139,8 @@ func (s *Swarm32) ChangeInertiaMax(inertiamax float32) {
 func (s *Swarm32) ChangeMode(mode Mode) {
 	s.mode = mode
 	var m Mode
-	if s.mode == m.Constriction(){
-		if math.IsNaN(float64(s.constriction)){
+	if s.mode == m.Constriction() {
+		if math.IsNaN(float64(s.constriction)) {
 			panic("Constriction is nan: Cognative + Social mus be > 4")
 		}
 	}
@@ -257,8 +257,8 @@ func (s *Swarm32) setswarm(
 	gamma := float64(social + cognative)
 	s.constriction = float32(2 / (2 - gamma - math.Sqrt((gamma*gamma)-4*gamma)))
 	var m Mode
-	if s.mode == m.Constriction(){
-		if gamma <=4{
+	if s.mode == m.Constriction() {
+		if gamma <= 4 {
 			panic("Constriction limitation: Cognative + Social <= 4")
 		}
 	}
@@ -289,6 +289,14 @@ func (s *Swarm32) ResetParticles(indexes []FitnessIndex32, resetglobalposition b
 	for i := range indexes {
 		s.particles[indexes[i].Particle].reset(s.vmax, s.xminstart, s.xmaxstart, s.alphamax, s.inertiamax)
 	}
+
+	return nil
+}
+
+//ResetParticle resets the particles based on the index array passed
+func (s *Swarm32) ResetParticle(index int) error {
+
+	s.particles[index].reset(s.vmax, s.xminstart, s.xmaxstart, s.alphamax, s.inertiamax)
 
 	return nil
 }
@@ -334,7 +342,7 @@ func (s *Swarm32) GlobalPosition() []float32 {
 
 //ParticlePosition returns the particle position of the index passed
 func (s *Swarm32) ParticlePosition(index int) []float32 {
-	if index>len(s.particles)-1{
+	if index > len(s.particles)-1 {
 		return nil
 	}
 	return s.particles[index].position
@@ -413,8 +421,9 @@ func (s *Swarm32) AllFitnesses(previousfitnesses []FitnessIndex32) []FitnessInde
 	})
 	return previousfitnesses
 }
+
 //SyncUpdateMultiThread is a MultiThreaded sync update
-func (s *Swarm32)SyncUpdateMultiThread(fitnesses []float32)error{
+func (s *Swarm32) SyncUpdateMultiThread(fitnesses []float32) error {
 	if len(fitnesses) != len(s.particles) {
 		return errors.New("Sizes of losses and num of particles not the same")
 	}
@@ -431,20 +440,21 @@ func (s *Swarm32)SyncUpdateMultiThread(fitnesses []float32)error{
 	if position > -1 {
 		copy(s.globalposition, s.particles[position].position)
 	}
-	
+
 	var wg sync.WaitGroup
 	for i := range s.particles {
-	wg.Add(1)
-go func(i int){
-	s.particles[i].update(s.mode, s.cognative, s.social, s.vmax, s.constriction, s.globalposition)
-wg.Done()
-	}(i)
-	
+		wg.Add(1)
+		go func(i int) {
+			s.particles[i].update(s.mode, s.cognative, s.social, s.vmax, s.constriction, s.globalposition)
+			wg.Done()
+		}(i)
+
 	}
 	wg.Wait()
 	s.k++
 	return nil
 }
+
 //SyncUpdate updates the particle swarm after all particles tested
 func (s *Swarm32) SyncUpdate(fitnesses []float32) error {
 	if len(fitnesses) != len(s.particles) {
