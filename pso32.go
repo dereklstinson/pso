@@ -295,7 +295,9 @@ func (s *Swarm32) ResetParticles(indexes []FitnessIndex32, resetglobalposition b
 
 //ResetParticle resets the particles based on the index array passed
 func (s *Swarm32) ResetParticle(index int) error {
-
+	if index >= len(s.particles) {
+		return errors.New("Index out of bounds")
+	}
 	s.particles[index].reset(s.vmax, s.xminstart, s.xmaxstart, s.alphamax, s.inertiamax)
 
 	return nil
