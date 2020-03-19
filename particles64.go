@@ -115,12 +115,14 @@ func (p *particle64) dimvr(cognative, social, vmaxgamma float64, globalbest []fl
 }
 func (p *particle64) linearinertiareduce(cognative, social, vmax float64, globalbest []float64) {
 	for i := range p.velocity {
-		p.velocity[i] = (p.alpha * p.inertia * p.velocity[i]) + cognative*p.rng.Float64()*(p.indvbest[i]-p.position[i]) + social*p.rng.Float64()*(globalbest[i]-p.position[i])
+		p.velocity[i] = (p.inertia * p.velocity[i]) + cognative*p.rng.Float64()*(p.indvbest[i]-p.position[i]) + social*p.rng.Float64()*(globalbest[i]-p.position[i])
 
 		p.velocity[i] = minmagnitudef64(p.velocity[i], vmax)
-		p.inertia *= p.alpha
+
 		p.position[i] += p.velocity[i]
 	}
+	p.inertia *= p.alpha
+
 }
 func (p *particle64) vanilla(cognative, social, vmax float64, globalbest []float64) {
 	for i := range p.velocity {
